@@ -8,6 +8,10 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return 'Ethical Movie Recommender API'
+
 # Load ratings and movies data
 ratings = pd.read_csv('ml-latest-small/ratings.csv')
 movies = pd.read_csv('ml-latest-small/movies.csv')
