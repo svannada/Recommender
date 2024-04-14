@@ -117,72 +117,78 @@ vectors = cv.fit_transform(movies_df['final_tag']).toarray()
 
 
 def recommend_movies_collab(user_id, watched_movies, num_recommendations=5):
-    # Find similar users
-    similar_users = np.argsort(similarity_scores[user_id])[::-1][1:]  # Exclude the user itself
-    
-    # Get movies rated by the user
-    user_movies = pivot_ratings.iloc[user_id][pivot_ratings.iloc[user_id] != 0].index
-    
-    # Initialize dictionary to store movie recommendations
-    recommended_movies = {}
-    
-    # Iterate over similar users
-    for similar_user in similar_users:
-        # Get movies rated by the similar user
-        similar_user_movies = pivot_ratings.iloc[similar_user][pivot_ratings.iloc[similar_user] != 0].index
+    if(num_recommendations) > 0:
+        # Find similar users
+        similar_users = np.argsort(similarity_scores[user_id])[::-1][1:]  # Exclude the user itself
         
-        # Exclude movies already rated by the user
-        new_movies = np.setdiff1d(similar_user_movies, user_movies)
+        # Get movies rated by the user
+        user_movies = pivot_ratings.iloc[user_id][pivot_ratings.iloc[user_id] != 0].index
         
-        # Add new movies to recommendations
-        for movie in new_movies:
-            if movie in recommended_movies:
-                recommended_movies[movie] += similarity_scores[user_id][similar_user]  # Use similarity score here
-            else:
-                recommended_movies[movie] = similarity_scores[user_id][similar_user]  # Use similarity score here
-    
-    # Convert the watched movie IDs to a set for faster lookup
-    watched_movie_ids = set(watched_movies['movieId'])
+        # Initialize dictionary to store movie recommendations
+        recommended_movies = {}
+        
+        # Iterate over similar users
+        for similar_user in similar_users:
+            # Get movies rated by the similar user
+            similar_user_movies = pivot_ratings.iloc[similar_user][pivot_ratings.iloc[similar_user] != 0].index
+            
+            # Exclude movies already rated by the user
+            new_movies = np.setdiff1d(similar_user_movies, user_movies)
+            
+            # Add new movies to recommendations
+            for movie in new_movies:
+                if movie in recommended_movies:
+                    recommended_movies[movie] += similarity_scores[user_id][similar_user]  # Use similarity score here
+                else:
+                    recommended_movies[movie] = similarity_scores[user_id][similar_user]  # Use similarity score here
+        
+        # Convert the watched movie IDs to a set for faster lookup
+        watched_movie_ids = set(watched_movies['movieId'])
 
-    # Filter out watched movies from recommended movies
-    filtered_recommendations = {movie_id: score for movie_id, score in recommended_movies.items() if movie_id not in watched_movie_ids}
+        # Filter out watched movies from recommended movies
+        filtered_recommendations = {movie_id: score for movie_id, score in recommended_movies.items() if movie_id not in watched_movie_ids}
 
-    # Sort filtered recommended movies by score
-    sorted_recommendations = sorted(filtered_recommendations.items(), key=lambda x: x[1], reverse=True)
-    
-    # Get movie titles from sorted recommendations
-    movie_titles = [title for title, _ in sorted_recommendations[:num_recommendations]]
+        # Sort filtered recommended movies by score
+        sorted_recommendations = sorted(filtered_recommendations.items(), key=lambda x: x[1], reverse=True)
+        
+        # Get movie titles from sorted recommendations
+        movie_titles = [title for title, _ in sorted_recommendations[:num_recommendations]]
 
-    # Filter movies from movies_df based on titles
-    recommended_movies = movies_df[movies_df['title'].isin(movie_titles)]
+        # Filter movies from movies_df based on titles
+        recommended_movies = movies_df[movies_df['title'].isin(movie_titles)]
+    else:
+        recommended_movies  = pd.DataFrame()
     return recommended_movies
 
 def recommend_movies_content(user_id, watched_movies, num_recommendations=5):
-    # Find movies rated by the user
-    user_movies = ratings[ratings['userId'] == user_id].merge(movies_df, on='movieId', how='left')
-    
-    user_vectors = cv.transform(user_movies['final_tag']).toarray()
-    
-    # Compute cosine similarity between user's movies and all movies
-    user_similarity  = cosine_similarity(user_vectors, vectors)
+    if(num_recommendations) > 0:
+        # Find movies rated by the user
+        user_movies = ratings[ratings['userId'] == user_id].merge(movies_df, on='movieId', how='left')
+        
+        user_vectors = cv.transform(user_movies['final_tag']).toarray()
+        
+        # Compute cosine similarity between user's movies and all movies
+        user_similarity  = cosine_similarity(user_vectors, vectors)
 
-    # Get average similarity score for each movie rated by the user
-    avg_similarity = np.mean(user_similarity, axis=0)
-    
-    # Get indices of movies sorted by similarity score
-    sorted_indices = np.argsort(avg_similarity)[::-1]
+        # Get average similarity score for each movie rated by the user
+        avg_similarity = np.mean(user_similarity, axis=0)
+        
+        # Get indices of movies sorted by similarity score
+        sorted_indices = np.argsort(avg_similarity)[::-1]
 
-    # Filter out watched movies from sorted indices
-    filtered_indices = [index for index in sorted_indices if movies_df.iloc[index]['movieId'] not in watched_movies['movieId']]
+        # Filter out watched movies from sorted indices
+        filtered_indices = [index for index in sorted_indices if movies_df.iloc[index]['movieId'] not in watched_movies['movieId']]
 
-    # Get movie titles from filtered indices
-    movie_titles = movies_df.iloc[filtered_indices[:num_recommendations]]['title']
+        # Get movie titles from filtered indices
+        movie_titles = movies_df.iloc[filtered_indices[:num_recommendations]]['title']
 
-    # Use movie_titles to create a boolean mask
-    mask = movies_df['title'].isin(movie_titles)
+        # Use movie_titles to create a boolean mask
+        mask = movies_df['title'].isin(movie_titles)
 
-    # Apply the mask to movies_df to get recommended movies
-    recommended_movies = movies_df[mask]
+        # Apply the mask to movies_df to get recommended movies
+        recommended_movies = movies_df[mask]
+    else:
+        recommended_movies = pd.DataFrame()
 
     return recommended_movies
 
@@ -194,8 +200,8 @@ def recommend_movies():
     user_similarity_slider = float(request.args.get('userSimilaritySlider'))
     num_recommendations = int(request.args.get('numRecommendations'))
 
-    num_recommendations_collab = int(content_slider * num_recommendations)
-    num_recommendations_content = int(user_similarity_slider * num_recommendations)
+    num_recommendations_collab = int(user_similarity_slider * num_recommendations)
+    num_recommendations_content = int(content_slider * num_recommendations)
 
     user_ratings =  ratings[ratings['userId'] == user_id]['movieId']
     # Use movie_titles to create a boolean mask
