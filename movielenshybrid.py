@@ -23,6 +23,7 @@ def home():
     return 'Ethical Movie Recommender API'
 
 # Load ratings and movies data
+ref_ratings = pd.read_csv('ml-latest-small/ratings.csv')
 ratings = pd.read_csv('ml-latest-small/ratings.csv')
 movies = pd.read_csv('ml-latest-small/movies.csv')
 # Load movie links data
@@ -209,6 +210,18 @@ def recommend_movies():
         'recommended_movies': recommended_movies_dict,
         'watched_movies': watched_movies_dict
     })
+
+@app.route('/api/popularusers', methods=['GET'])
+def popular_users():
+    # Get popular users with at least 500 ratings
+    popular_users = ref_ratings.groupby('userId')['rating'].count()
+    popular_users = popular_users[popular_users >= 500]
+    popular_userlist = popular_users.index
+    # Return as JSON response
+    return jsonify({
+        'popular_users': popular_userlist
+    })
+
 
 if __name__ == '__main__':
     app.run()
