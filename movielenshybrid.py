@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 # List of allowed origins
 allowed_origins = [
-    "http://example1.com",
+    "https://recommender-ui.vercel.app/",
     "http://localhost:3000"
 ]
 
