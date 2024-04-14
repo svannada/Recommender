@@ -9,14 +9,8 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-# List of allowed origins
-allowed_origins = [
-    "https://recommender-l084mdwv9-sridhar-vannadas-projects.vercel.app/",
-    "http://localhost:3000"
-]
-
 # Configure CORS with allowed origins list
-cors = CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.route('/')
 def home():
