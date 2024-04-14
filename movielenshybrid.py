@@ -216,7 +216,7 @@ def popular_users():
     # Get popular users with at least 500 ratings
     popular_users = ref_ratings.groupby('userId')['rating'].count()
     popular_users = popular_users[popular_users >= 500]
-    popular_userlist = popular_users.index
+    popular_userlist = popular_users.index.tolist()
     # Return as JSON response
     return jsonify({
         'popular_users': popular_userlist
