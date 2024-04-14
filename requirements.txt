@@ -4,3 +4,4 @@ scikit-learn
 flask
 gunicorn
 nltk
+flask-cors

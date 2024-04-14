@@ -4,9 +4,19 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+
+# List of allowed origins
+allowed_origins = [
+    "http://example1.com",
+    "http://localhost:3000"
+]
+
+# Configure CORS with allowed origins list
+cors = CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
 
 @app.route('/')
 def home():
@@ -168,7 +178,7 @@ def recommend_movies_content(user_id, num_recommendations=5):
     return recommended_movies
 
 
-@app.route('/recommend', methods=['GET'])
+@app.route('/api/recommend', methods=['GET'])
 def recommend_movies():
     user_id = int(request.args.get('userId'))
     content_slider = float(request.args.get('contentSlider'))
