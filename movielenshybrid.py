@@ -142,15 +142,15 @@ def recommend_movies_collab(user_id, watched_movies, num_recommendations=5):
                 else:
                     recommended_movies[movie] = similarity_scores[user_id][similar_user]  # Use similarity score here
         
-        # Convert the watched movie IDs to a set for faster lookup
-        watched_movie_ids = set(watched_movies['movieId'])
+        # Convert the watched movie titles to a set for faster lookup
+        watched_movie_titles = set(watched_movies['title'])
 
         # Filter out watched movies from recommended movies
-        filtered_recommendations = {movie_id: score for movie_id, score in recommended_movies.items() if movie_id not in watched_movie_ids}
+        filtered_recommendations = {title: score for title, score in recommended_movies.items() if title not in watched_movie_titles}
 
         # Sort filtered recommended movies by score
         sorted_recommendations = sorted(filtered_recommendations.items(), key=lambda x: x[1], reverse=True)
-        
+
         # Get movie titles from sorted recommendations
         movie_titles = [title for title, _ in sorted_recommendations[:num_recommendations]]
 
