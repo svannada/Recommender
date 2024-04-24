@@ -51,6 +51,9 @@ This Python script implements a movie recommender system using collaborative fil
 2. Place CSV files (ratings.csv, movies.csv, links.csv, tags.csv) in the same directory as the script.
 3. Run the script (`python movielenshybrid.py`) and access the API endpoint '/recommend' to get movie recommendations.
 
+## Deployed URL
+This API is deployed at heroku with the URL - https://data472recommenderapi-dfd873cfc1f2.herokuapp.com/
+
 ## Author
 Sridhar
 
