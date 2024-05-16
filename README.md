@@ -34,7 +34,7 @@ This Python script implements a movie recommender system using collaborative fil
 
 ## Web Service API
 - Defines a Flask app with a single endpoint '/recommend' for movie recommendations.
-- Accepts parameters like user ID, content slider, user similarity slider, exclude watched, and number of recommendations.
+- Accepts parameters like user ID, content slider, user similarity slider, and number of recommendations.
 - Integrates collaborative and content-based filtering to generate movie recommendations.
 - Returns recommended movies and watched movies with URLs.
 
